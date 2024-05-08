@@ -69,9 +69,9 @@ public class MailVerify extends JavaPlugin implements Listener {
         String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=false";
         try {
             connection = DriverManager.getConnection(url, username, password);
-            getLogger().info("Veritabanına başarıyla bağlanıldı.");
+            getLogger().info("Veritabanına başarıyla bağlanıldı." + host + ":" + port + "/" + database);
         } catch (SQLException e) {
-            getLogger().warning("Veritabanına bağlanırken bir hata oluştu: " + e.getMessage());
+            getLogger().warning("Veritabanına bağlanırken bir hata oluştu: " + e.getMessage());  //veri tabanına bağlanmaz ise bu hatayı vericektir
         }
     }
 
@@ -79,7 +79,7 @@ public class MailVerify extends JavaPlugin implements Listener {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
-                getLogger().info("Veritabanı bağlantısı kapatıldı.");
+                getLogger().info("Veritabanı bağlantısı kapatıldı." + host + ":" + port + "/" + database);
             }
         } catch (SQLException e) {
             getLogger().warning("Veritabanı bağlantısı kapatılırken bir hata oluştu: " + e.getMessage());
