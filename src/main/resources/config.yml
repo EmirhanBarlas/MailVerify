@@ -2,6 +2,9 @@
 # VERİTABANINA BAĞLANMAZ İSE EKLENTİ DEVRE DIŞI KALICAKTIR.
 # Eğer webhosting'e bağlamak isterseniz makinanızın ip adresini cpanel kısmından uzak MySQL'e girmeyi unutmayın.
 
+# AYRICA EKLENTİNİN KAYNAK KODUNA ULAŞMAK İÇİN https://github.com/EmirhanBarlas/MailVerify
+# STAR ATMAYI UNUTMAYINIZ = )
+
 mysql:
   host: "localhost"
   port: "3306"
