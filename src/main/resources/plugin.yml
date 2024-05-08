@@ -1,0 +1,14 @@
+name: MailVerify
+version: '${project.version}'
+main: org.splendid.mailverify.MailVerify
+api-version: '1.20'
+
+commands:
+  eposta:
+    description: Oyuncunun e-posta adresini doğrular.
+    usage: /eposta <e-posta_adresi>
+
+permissions:
+  mailverify.use:
+    description: E-posta doğrulama komutunu kullanma izni.
+    default: true

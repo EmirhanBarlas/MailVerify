@@ -1,0 +1,17 @@
+mysql:
+  host: "localhost"
+  port: "3306"
+  database: "test"
+  username: "root"
+  password: ""
+  table: "eposta"
+
+messages:
+  success_message: "&aE-posta adresiniz başarıyla kaydedildi."
+  usage_message: "&cDoğru kullanım: /eposta <e-posta>"
+  player_only_message: "&cBu komutu yalnızca bir oyuncu kullanabilir."
+  email_not_verified_warning: "&cE-posta adresinizi doğrulamadığınız için belirli bir süre içinde sunucudan atılacaksınız. &8(&e/eposta <e-posta>&8) &aile tekrar deneyebilirsiniz."
+  kick_message: "&cE-posta adresinizi doğrulamadığınız için sunucudan atıldınız."
+
+settings:
+  verification_timeout_minutes: 10
