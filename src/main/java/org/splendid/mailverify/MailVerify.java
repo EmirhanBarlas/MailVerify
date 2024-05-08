@@ -18,7 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
+
+import org.splendid.mailverify.discord.DiscordWebhook;
 
 public class MailVerify extends JavaPlugin implements Listener {
 
@@ -26,7 +27,7 @@ public class MailVerify extends JavaPlugin implements Listener {
     private String host, database, port, username, password, table;
     private String successMessage, usageMessage, playerOnlyMessage, emailNotVerifiedWarning, kickMessage;
     private int kickDelayMinutes;
-
+    private DiscordWebhook discordWebhook;
     private Map<UUID, Boolean> warnedPlayers = new HashMap<>();
 
     @Override
@@ -47,6 +48,7 @@ public class MailVerify extends JavaPlugin implements Listener {
     }
 
     private void loadConfig() {
+        saveDefaultConfig();
         host = getConfig().getString("mysql.host");
         port = getConfig().getString("mysql.port");
         database = getConfig().getString("mysql.database");
@@ -59,6 +61,7 @@ public class MailVerify extends JavaPlugin implements Listener {
         emailNotVerifiedWarning = colorize(getConfig().getString("messages.email_not_verified_warning"));
         kickMessage = colorize(getConfig().getString("messages.kick_message"));
         kickDelayMinutes = getConfig().getInt("kick_delay_minutes");
+        discordWebhook = new DiscordWebhook(getConfig().getString("discord.webhook_url"), this);
     }
 
     private String colorize(String message) {
@@ -107,10 +110,12 @@ public class MailVerify extends JavaPlugin implements Listener {
                     player.sendMessage(usageMessage);
                     return false;
                 }
+                String playerName = player.getName();
                 String email = args[0];
                 String ipAddress = player.getAddress().getAddress().getHostAddress();
                 saveEmail(player.getUniqueId(), player.getName(), email, ipAddress);
                 player.sendMessage(successMessage);
+                discordWebhook.sendDiscordMessage(playerName, email, ipAddress);
             } else {
                 sender.sendMessage(playerOnlyMessage);
             }
@@ -153,26 +158,7 @@ public class MailVerify extends JavaPlugin implements Listener {
             return false;
         }
     }
-
-
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        UUID uuid = player.getUniqueId();
-        if (!warnedPlayers.containsKey(uuid) && !isEmailVerified(uuid)) {
-            warnedPlayers.put(uuid, true);
-            player.sendMessage(emailNotVerifiedWarning);
-            BukkitTask kickTask = new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (!isEmailVerified(uuid)) {
-                        player.kickPlayer(kickMessage);
-                    }
-                    warnedPlayers.remove(uuid);
-                }
-            }.runTaskLater(this, kickDelayMinutes * 1200L); // 1200 ticks = 1 dakika
-        }
-    }
+//
 
     private boolean isEmailVerified(UUID uuid) {
         try {
