@@ -1,0 +1,4 @@
+name: MailVerify
+version: '${project.version}'
+main: org.splendid.mailverify.MailVerify
+api-version: '1.20'
