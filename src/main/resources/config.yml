@@ -8,10 +8,10 @@
 mysql:
   host: "localhost"
   port: "3306"
-  database: "test"
+  database: "splendidnwcom_sp"
   username: "root"
   password: ""
-  table: "eposta"
+  table: "accounts"
 
 messages:
   success_message: "&aE-posta adresiniz başarıyla kaydedildi."
@@ -20,8 +20,7 @@ messages:
   email_not_verified_warning: "&cE-posta adresinizi doğrulamadığınız için belirli bir süre içinde sunucudan atılacaksınız. &8(&e/eposta <e-posta>&8) &aile tekrar deneyebilirsiniz."
   kick_message: "&cE-posta adresinizi doğrulamadığınız için sunucudan atıldınız."
 
-settings:
-  verification_timeout_minutes: 10
+kick_delay_minutes: 1
 
 discord:
   webhook_url: "https://discord.com/api/webhooks/1197584423823081503/p-y-hp1SmZMnzpfipLOaa8tjIH4gMz803Mm1hOvrscFknaKb11Ck83CJamMuxg8tVJ5C"

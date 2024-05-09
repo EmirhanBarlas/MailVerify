@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import org.jetbrains.annotations.NotNull;
 import org.splendid.mailverify.discord.DiscordWebhook;
 
 public class MailVerify extends JavaPlugin implements Listener {
@@ -47,7 +48,7 @@ public class MailVerify extends JavaPlugin implements Listener {
         getLogger().info("MailVerify eklentisi devre dışı bırakıldı.");
     }
 
-    private void loadConfig() {
+    public void loadConfig() {
         saveDefaultConfig();
         host = getConfig().getString("mysql.host");
         port = getConfig().getString("mysql.port");
@@ -102,7 +103,7 @@ public class MailVerify extends JavaPlugin implements Listener {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("eposta")) {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
@@ -158,7 +159,25 @@ public class MailVerify extends JavaPlugin implements Listener {
             return false;
         }
     }
-//
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
+        if (!isEmailVerified(uuid)) {
+            warnedPlayers.put(uuid, true);
+            player.sendMessage(emailNotVerifiedWarning);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!isEmailVerified(uuid)) {
+                        player.kickPlayer(kickMessage);
+                        warnedPlayers.remove(uuid);
+                    }
+                }
+            }.runTaskLater(this, kickDelayMinutes * 1200L);
+        }
+    }
 
     private boolean isEmailVerified(UUID uuid) {
         try {
