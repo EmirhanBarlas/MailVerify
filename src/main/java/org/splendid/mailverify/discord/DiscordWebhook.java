@@ -31,7 +31,7 @@ public class DiscordWebhook {
 
             Player player = Bukkit.getPlayer(playerName);
             assert player != null;
-            String headImageUrl = String.format("https://crafatar.com/avatars/%s?overlay", player.getUniqueId());
+            String headImageUrl = String.format("https://mc-heads.net/avatar/%s?/100/pp.png", player.getUniqueId());
             WebhookEmbedBuilder embedBuilder = new WebhookEmbedBuilder()
                     .setColor(7185242)
                     .setDescription(message)

@@ -2,7 +2,6 @@ package org.splendid.mailverify;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -69,11 +69,17 @@ public class MailVerify extends JavaPlugin implements Listener {
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 
+    /**
+     * Connects to the database using the specified host, port, database, username, and password.
+     *
+     * @return Connection to the database
+     **/
+
+
     private void connectToDatabase() {
         String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=false";
         try {
             connection = DriverManager.getConnection(url, username, password);
-            getLogger().info("Veritabanına başarıyla bağlanıldı." + host + ":" + port + "/" + database);
         } catch (SQLException e) {
             getLogger().warning("Veritabanına bağlanırken bir hata oluştu: " + e.getMessage());  //veri tabanına bağlanmaz ise bu hatayı vericektir
         }
@@ -89,6 +95,11 @@ public class MailVerify extends JavaPlugin implements Listener {
             getLogger().warning("Veritabanı bağlantısı kapatılırken bir hata oluştu: " + e.getMessage());
         }
     }
+
+
+    /**
+     * Creates a table if it does not already exist in the database.
+     */
 
     private void createTableIfNotExists() {
         try {
@@ -113,10 +124,11 @@ public class MailVerify extends JavaPlugin implements Listener {
                 }
                 String playerName = player.getName();
                 String email = args[0];
-                String ipAddress = player.getAddress().getAddress().getHostAddress();
+                String ipAddress = Objects.requireNonNull(player.getAddress()).getAddress().getHostAddress();
                 saveEmail(player.getUniqueId(), player.getName(), email, ipAddress);
                 player.sendMessage(successMessage);
                 discordWebhook.sendDiscordMessage(playerName, email, ipAddress);
+                connectToDatabase();
             } else {
                 sender.sendMessage(playerOnlyMessage);
             }
@@ -124,6 +136,15 @@ public class MailVerify extends JavaPlugin implements Listener {
         }
         return false;
     }
+
+    /**
+     * Saves the email information into the database if the email does not already exist.
+     *
+     * @param  uuid       the UUID of the player
+     * @param  username   the username of the player
+     * @param  email      the email to be saved
+     * @param  ipAddress  the IP address of the player
+     */
 
     private void saveEmail(UUID uuid, String username, String email, String ipAddress) {
         try {
