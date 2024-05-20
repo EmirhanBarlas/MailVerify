@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.bukkit.scheduler.BukkitRunnable;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,10 +29,10 @@ public class MailVerify extends JavaPlugin implements Listener {
 
     private Connection connection;
     private String host, database, port, username, password, table;
-    private String successMessage, usageMessage, playerOnlyMessage, emailNotVerifiedWarning, kickMessage;
+    private String successMessage, invalidEmailMessage, usageMessage, playerOnlyMessage, emailNotVerifiedWarning, kickMessage, reloadMessage;
     private int kickDelayMinutes;
     private DiscordWebhook discordWebhook;
-    private Map<UUID, Boolean> warnedPlayers = new HashMap<>();
+    private final Map<UUID, Boolean> warnedPlayers = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -40,6 +43,13 @@ public class MailVerify extends JavaPlugin implements Listener {
         createTableIfNotExists();
         getServer().getPluginManager().registerEvents(this, this);
         getLogger().info("MailVerify eklentisi başarıyla etkinleştirildi.");
+
+        Objects.requireNonNull(this.getCommand("reload")).setExecutor((sender, command, label, args) -> {
+            reloadConfig();
+            loadConfig();
+            sender.sendMessage(reloadMessage);
+            return true;
+        });
     }
 
     @Override
@@ -57,11 +67,13 @@ public class MailVerify extends JavaPlugin implements Listener {
         password = getConfig().getString("mysql.password");
         table = getConfig().getString("mysql.table");
         successMessage = colorize(getConfig().getString("messages.success_message"));
+        invalidEmailMessage = colorize(getConfig().getString("messages.invalid_email_message"));
         usageMessage = colorize(getConfig().getString("messages.usage_message"));
         playerOnlyMessage = colorize(getConfig().getString("messages.player_only_message"));
         emailNotVerifiedWarning = colorize(getConfig().getString("messages.email_not_verified_warning"));
         kickMessage = colorize(getConfig().getString("messages.kick_message"));
         kickDelayMinutes = getConfig().getInt("kick_delay_minutes");
+        reloadMessage = colorize(getConfig().getString("messages.reload_message"));
         discordWebhook = new DiscordWebhook(getConfig().getString("discord.webhook_url"), this);
     }
 
@@ -71,8 +83,6 @@ public class MailVerify extends JavaPlugin implements Listener {
 
     /**
      * Connects to the database using the specified host, port, database, username, and password.
-     *
-     * @return Connection to the database
      **/
 
 
@@ -122,8 +132,19 @@ public class MailVerify extends JavaPlugin implements Listener {
                     player.sendMessage(usageMessage);
                     return false;
                 }
-                String playerName = player.getName();
                 String email = args[0];
+
+                // Email doğrulama
+                String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.(com|org|net|edu|gov|mil|biz|info|mobi|name|aero|jobs|museum)$";
+                Pattern pattern = Pattern.compile(emailRegex);
+                Matcher matcher = pattern.matcher(email);
+
+                if (!matcher.matches()) {
+                    player.sendMessage(invalidEmailMessage);
+                    return false;
+                }
+
+                String playerName = player.getName();
                 String ipAddress = Objects.requireNonNull(player.getAddress()).getAddress().getHostAddress();
                 saveEmail(player.getUniqueId(), player.getName(), email, ipAddress);
                 player.sendMessage(successMessage);

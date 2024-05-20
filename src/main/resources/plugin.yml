@@ -8,6 +8,10 @@ commands:
   eposta:
     description: Oyuncunun e-posta adresini doğrular.
     usage: /eposta <e-posta_adresi>
+  reload:
+    description: Yapılandırma dosyasını yeniden yükle.
+    usage: /reload
+    permission: mailverify.reload
 
 permissions:
   mailverify.use:
