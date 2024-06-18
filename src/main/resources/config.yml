@@ -25,4 +25,4 @@ messages:
 kick_delay_minutes: 1
 
 discord:
-  webhook_url: "https://discord.com/api/webhooks/1197584423823081503/p-y-hp1SmZMnzpfipLOaa8tjIH4gMz803Mm1hOvrscFknaKb11Ck83CJamMuxg8tVJ5C"
+  webhook_url: ""
